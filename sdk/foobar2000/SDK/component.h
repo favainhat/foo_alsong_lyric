@@ -4,13 +4,15 @@
 class foobar2000_component_globals {
 public:
 	foobar2000_component_globals() {
+#ifdef _MSC_VER
 #ifndef _DEBUG
 		::OverrideCrtAbort();
+#endif
 #endif
 	}
 };
 
-class NOVTABLE foobar2000_client : public foobar2000_component_globals
+class NOVTABLE foobar2000_client
 {
 public:
 	typedef service_factory_base* pservice_factory_base;
