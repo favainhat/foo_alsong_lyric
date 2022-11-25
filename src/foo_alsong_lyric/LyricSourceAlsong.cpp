@@ -55,6 +55,9 @@ DWORD LyricSourceAlsong::GetFileHash(const metadb_handle_ptr &track, CHAR *Hash)
 			file_info_impl info;
 			track->get_info(info);
 			const char *realfile = info.info_get("referenced_file");
+			if (realfile == nullptr) {
+				return false;
+			}
 			const char *ttmp = info.info_get("referenced_offset");
 			int m, s, ms;
 			if(ttmp == NULL)
@@ -163,6 +166,26 @@ DWORD LyricSourceAlsong::GetFileHash(const metadb_handle_ptr &track, CHAR *Hash)
 				}
 
 			}
+			else if(!StrCmpIA(fmt, "m4a"))
+			{
+				//처음 나오는 mdat_chunk 검색
+				i = 0;
+				CHAR mdat_chunk[4] = {0x6D, 0x64, 0x61, 0x74}; //mdat start?
+				while(1)
+				{
+					sourcefile->seek(i, abort_callback);
+					sourcefile->read(temp, 4, abort_callback);
+					if(!memcmp(temp, mdat_chunk, 4))
+					{
+						Start = i-4;
+						break;
+					}
+					i ++;
+					if(i > sourcefile->get_size(abort_callback))
+						return false; //에러
+				}
+
+			}
 			else
 				Start = 0;
 
@@ -244,7 +267,7 @@ boost::shared_ptr<Lyric> LyricSourceAlsong::Get(const metadb_handle_ptr &track)
 	GetFileHash(track, Hash);
 
 	SoapHelper helper;
-	helper.SetMethod("ns1:GetLyric5");
+	helper.SetMethod("ns1:GetLyric8");
 	helper.AddParameter("ns1:strChecksum", Hash);
 	helper.AddParameter("ns1:strVersion", ALSONG_VERSION);
 	helper.AddParameter("ns1:strMACAddress", Local_Mac);
@@ -255,7 +278,7 @@ boost::shared_ptr<Lyric> LyricSourceAlsong::Get(const metadb_handle_ptr &track)
 
 	try
 	{
-		return boost::shared_ptr<Lyric>(new AlsongLyric(helper.Execute()->first_element_by_path("soap:Envelope/soap:Body/GetLyric5Response/GetLyric5Result")));
+		return boost::shared_ptr<Lyric>(new AlsongLyric(helper.Execute()->first_element_by_path("soap:Envelope/soap:Body/GetLyric8Response/GetLyric8Result")));
 	}
 	catch(...)
 	{

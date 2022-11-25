@@ -41,10 +41,12 @@ void SoapHelper::SetMethod(const char *MethodName)
 	pugi::xml_node method = m_Body.append_child();
 	method.set_name(MethodName);
 	m_Query = method.append_child();
+	m_Query.set_name("ns1:encData");
+	m_Query.append_child(pugi::node_pcdata).set_value("8582df6473c019a3186a2974aa1e034ae1b2bbb2e7c99575aadc475fcddd997d74bbc1ce3d50b9900282903ee9eb60ae8c5bbf27484441bacb41ecf9128402696641655ff38c2cbbf3c81396034a883af2d82e0545ec32170bddc7c141208e7255e367e5b5ebd81750226856f5405ec3ad7b6f8600c32c2718c4c525bfe34666");
+	m_Query = method.append_child();
 	m_Query.set_name("ns1:stQuery");
 	m_MethodName = MethodName;
 }
-
 void SoapHelper::AddParameter(const char *ParameterName, const char *value)
 {
 	pugi::xml_node param = m_Query.append_child();

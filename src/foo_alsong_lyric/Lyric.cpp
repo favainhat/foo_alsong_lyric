@@ -29,7 +29,8 @@ Lyric::Lyric()
 Lyric::Lyric(const char *raw)
 {
 	m_Lyric = raw;
-	Split("\r\n");
+	//Split("\r\n");
+	Split("\n");
 }
 
 Lyric::~Lyric()

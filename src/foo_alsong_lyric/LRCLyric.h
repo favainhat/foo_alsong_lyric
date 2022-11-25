@@ -28,7 +28,8 @@ public:
 	LRCLyric(std::string rawlyric, std::wstring filename)
 	{
 		m_Lyric.assign(rawlyric);
-		Split("\r\n");
+		//Split("\r\n");
+		Split("\n");
 
 		lstrcpy(m_filename, filename.c_str());
 	}

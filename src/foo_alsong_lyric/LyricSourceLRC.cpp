@@ -95,12 +95,12 @@ boost::shared_ptr<Lyric> LyricSourceLRC::Get(const metadb_handle_ptr &track)
 
 	CloseHandle(hf);
 
-	if(data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF) //utf8 bom
+	if (data[0] == (char)0xEF && data[1] == (char)0xBB && data[2] == (char)0xBF) //utf8 bom
 	{
 		lyric.assign(data + 3);
 		delete [] data;
 	}
-	else if(data[0] == 0xFF && data[1] == 0xFE) //utf16 bom
+	else if (data[0] == (char)0xFF && data[1] == (char)0xFE) //utf16 bom
 	{
 		lyric = EncodingFunc::ToUTF8((wchar_t *)data);
 		delete [] data;
