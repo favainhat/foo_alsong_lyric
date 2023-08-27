@@ -20,6 +20,7 @@
 #include "Lyric.h"
 #include "SoapHelper.h"
 #include "pugixml/pugixml.hpp"
+#include "regex"
 
 Lyric::Lyric()
 {
@@ -38,31 +39,46 @@ Lyric::~Lyric()
 
 }
 
+vector<string> split(const string& i_str, const string& i_delim)
+{
+	vector<string> result;
+	size_t startIndex = 0;
+
+	for (size_t found = i_str.find(i_delim); found != string::npos; found = i_str.find(i_delim, startIndex))
+	{
+		result.emplace_back(i_str.begin() + startIndex, i_str.begin() + found);
+		startIndex = found + i_delim.size();
+	}
+	if (startIndex != i_str.size())
+		result.emplace_back(i_str.begin() + startIndex, i_str.end());
+	return result;
+}
+
 DWORD Lyric::Split(const char *Delimiter)
 {
 	int i;
 
 	m_LyricLines.clear();
 
-	const char *nowpos = m_Lyric.c_str();
-	const char *lastpos = nowpos;
-	int delimlen = lstrlenA(Delimiter);
-	unsigned int pos;
-	for(i = 0; ; i ++) //<br>자르기
-	{
-		pos = boost::find_first(nowpos, Delimiter).end() - nowpos;
-		if(pos <= 10)
-			break;
-		nowpos = nowpos + pos;
+	std::string deli = std::string(Delimiter);
+	vector<string> lyrics = split(m_Lyric, deli);
+	for (i = 0; i< lyrics.size(); i++) {
+		std::regex e{ R"(\[(\d\d):(\d\d).(\d\d)\](.*))" };
 
-		int time = StrToIntA(lastpos + 1) * 60 * 100 + StrToIntA(lastpos + 4) * 100 + StrToIntA(lastpos + 7);
-		lastpos += 10; //strlen("[34:56.78]");
+		std::smatch sm;
+		std::regex_search(lyrics[i], sm, e);
 
-		std::string temp = std::string(lastpos, nowpos - lastpos - delimlen);
-		if(temp.length() == 0)
-			temp = " ";
+		if (sm.size() != 5) {
+			continue;
+		}
+		int minutes = stoi(sm[1]);
+		int sec = stoi(sm[2]);
+		int cent = stoi(sm[3]);
+		int total = ((minutes * 60) + sec) * 1000 + cent * 10;
+		int time = total / 10;
+		std::string temp = sm[4];
 		m_LyricLines.push_back(LyricLine(time, temp));
-		lastpos = nowpos;
+
 	}
 
 	m_LyricIterator = m_LyricLines.begin();

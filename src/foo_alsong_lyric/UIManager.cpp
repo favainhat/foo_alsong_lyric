@@ -113,7 +113,7 @@ void UIManager::Invalidated(HWND hWnd)
 		PostMessage(hWnd, WM_USER + 1, 0, 0);
 	}
 	else*/
-		InvalidateRect(hWnd, NULL, TRUE);
+		InvalidateRect(hWnd, NULL, FALSE);
 }
 
 LRESULT UIManager::ProcessMessage(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)

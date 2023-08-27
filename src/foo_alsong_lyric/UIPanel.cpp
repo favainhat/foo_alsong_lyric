@@ -92,6 +92,12 @@ void UIPanel::set_config(stream_reader * p_reader, t_size p_size, abort_callback
 			m_Setting.Ready();
 		}
 	}
+	else {
+		BYTE temp[sizeof(UIPreference) + 8] = { 0, };
+		memcpy(&m_Setting, &temp, sizeof(UIPreference));
+		m_Setting.SetDefault();
+		m_Setting.Ready();
+	}
 
 	m_UI = new UIManager(&m_Setting, &m_Script);
 }
