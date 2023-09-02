@@ -19,7 +19,7 @@
 
 #include "UIManager.h"
 
-class UIElement : public ui_element_instance, public ui_element
+class UIElement : public service_multi_inherit<ui_element_instance, ui_element>
 {
 public:
 	UIElement();

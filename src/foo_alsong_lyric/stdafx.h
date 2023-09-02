@@ -15,8 +15,8 @@
 * http://www.gnu.org/
 */
 
-#define _WIN32_WINDOWS 0x0501
-#define _WIN32_WINNT 0x0501
+#define _WIN32_WINDOWS 0x0601
+#define _WIN32_WINNT 0x05601
 
 #pragma warning(disable:4180) //Visual C++ bug
 
@@ -50,7 +50,7 @@
 
 #include "../../sdk/foobar2000/SDK/foobar2000.h"
 #include "../../sdk/foobar2000/helpers/helpers.h"
-#include "../../sdk/foobar2000/columns_ui-sdk/ui_extension.h"
+#include "../../sdk/columns_ui-sdk/ui_extension.h"
 #include "../../3rdparty/Squirrel/sqplus/sqplus.h"
 
 #pragma comment(lib, "ws2_32.lib")
@@ -61,7 +61,12 @@
 #pragma comment(lib, "uxtheme.lib")
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(linker, "\"/manifestdependency:type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#pragma comment(lib, "../../sdk/foobar2000/shared/shared.lib")
+
+#if defined _M_IX86
+#pragma comment(lib, "../../sdk/foobar2000/shared/shared-win32.lib")
+#elif defined _M_X64
+#pragma comment(lib, "../../sdk/foobar2000/shared/shared-x64.lib")
+#endif
 
 using namespace Gdiplus;
 using namespace std;

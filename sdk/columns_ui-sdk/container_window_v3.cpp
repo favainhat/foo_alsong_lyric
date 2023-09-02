@@ -4,7 +4,7 @@ namespace uie {
 
 HWND container_window_v3::create(HWND wnd_parent, int x, int y, int cx, int cy)
 {
-    if (!s_registered_classes.contains(m_config.class_name)) {
+    if(s_registered_classes.find(m_config.class_name) != s_registered_classes.end()){
         register_class();
     }
 

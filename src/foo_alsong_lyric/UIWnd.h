@@ -18,6 +18,8 @@
 #pragma once
 
 #include "UIManager.h"
+#include <ShObjIdl_core.h>
+#include <ShlGuid.h>
 
 class UIWnd
 {

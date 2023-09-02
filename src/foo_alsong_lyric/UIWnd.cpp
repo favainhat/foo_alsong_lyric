@@ -27,58 +27,6 @@
 
 UIWnd WndInstance; //singleton
 
-//SHGetPropertyStoreForWindow prototype
-typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *SHGPSFW)(HWND hwnd,
-														  REFIID riid,
-														  void** ppv);
-
-
-/* interface ICustomDestinationList */
-/* [unique][object][uuid] */ 
-
-typedef /* [v1_enum] */ 
-enum KNOWNDESTCATEGORY
-{	KDC_FREQUENT	= 1,
-KDC_RECENT	= ( KDC_FREQUENT + 1 ) 
-} 	KNOWNDESTCATEGORY;
-
-//icustomdestinationlist prototype
-EXTERN_C const IID IID_ICustomDestinationList;
-MIDL_INTERFACE("6332debf-87b5-4670-90c0-5e57b408a49e")
-ICustomDestinationList : public IUnknown
-{
-public:
-	virtual HRESULT STDMETHODCALLTYPE SetAppID( 
-		/* [string][in] */ __RPC__in_string LPCWSTR pszAppID) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE BeginList( 
-		/* [out] */ __RPC__out UINT *pcMinSlots,
-		/* [in] */ __RPC__in REFIID riid,
-		/* [iid_is][out] */ __RPC__deref_out_opt void **ppv) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE AppendCategory( 
-		/* [string][in] */ __RPC__in_string LPCWSTR pszCategory,
-		/* [in] */ __RPC__in_opt IObjectArray *poa) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE AppendKnownCategory( 
-		/* [in] */ KNOWNDESTCATEGORY category) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE AddUserTasks( 
-		/* [in] */ __RPC__in_opt IObjectArray *poa) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE CommitList( void) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE GetRemovedDestinations( 
-		/* [in] */ __RPC__in REFIID riid,
-		/* [iid_is][out] */ __RPC__deref_out_opt void **ppv) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE DeleteList( 
-		/* [string][unique][in] */ __RPC__in_opt_string LPCWSTR pszAppID) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE AbortList( void) = 0;
-
-};
-
 //dwm api
 
 // Blur behind data structures
@@ -143,7 +91,6 @@ HWND UIWnd::Create()
 	//windows 7 taskbar
 
 	HMODULE shell32 = LoadLibrary(L"shell32.dll");
-	SHGPSFW SHGetPropertyStoreForWindow = reinterpret_cast<SHGPSFW>(GetProcAddress(shell32, "SHGetPropertyStoreForWindow"));
 	m_Propstore = NULL;
 	if(SHGetPropertyStoreForWindow && cfg_use_jumplist)
 	{

@@ -300,4 +300,7 @@
     <Text Include="libPPUI-license.txt" />
     <Text Include="libPPUI-readme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
