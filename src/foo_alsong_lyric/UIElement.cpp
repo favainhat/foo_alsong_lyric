@@ -66,8 +66,8 @@ void UIElement::initialize_window(HWND parent)
 LRESULT CALLBACK UIElement::WindowProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if(iMessage == WM_NCCREATE)
-		SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)((CREATESTRUCT *)lParam)->lpCreateParams);
-	UIElement *_this = (UIElement *)GetWindowLongPtr(hWnd, GWL_USERDATA);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)((CREATESTRUCT *)lParam)->lpCreateParams);
+	UIElement *_this = (UIElement *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if(iMessage == WM_NCDESTROY)
 	{
 		if(_this)

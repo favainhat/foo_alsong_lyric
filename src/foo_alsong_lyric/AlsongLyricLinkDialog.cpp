@@ -79,10 +79,10 @@ UINT CALLBACK AlsongLyricLinkDialog::LyricModifyDialogProc(HWND hWnd, UINT iMess
 	{
 		_this = (AlsongLyricLinkDialog *)lParam;
 		_this->m_hWnd = hWnd;
-		SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)_this);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)_this);
 	}
 	else
-		_this = (AlsongLyricLinkDialog *)GetWindowLongPtr(hWnd, GWL_USERDATA);
+		_this = (AlsongLyricLinkDialog *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	return _this->DialogProc(iMessage, wParam, lParam);
 }
 

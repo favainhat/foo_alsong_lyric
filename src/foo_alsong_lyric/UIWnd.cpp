@@ -259,8 +259,8 @@ void UIWnd::StyleUpdated()
 LRESULT CALLBACK UIWnd::WindowProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if(iMessage == WM_NCCREATE)
-		SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)((CREATESTRUCT *)lParam)->lpCreateParams);
-	UIWnd *_this = (UIWnd *)GetWindowLongPtr(hWnd, GWL_USERDATA);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)((CREATESTRUCT *)lParam)->lpCreateParams);
+	UIWnd *_this = (UIWnd *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch(iMessage)
 	{
 	case WM_CLOSE:

@@ -36,7 +36,7 @@ private:
 public:
 	preferences_page_instance_alsong_lyric(HWND parent, preferences_page_callback::ptr callback) : m_callback(callback)
 	{
-		m_hWnd = uCreateDialog(IDD_PREF, parent, _PrefConfigProc, (LPARAM)this);
+		m_hWnd = uCreateDialog(IDD_PREF, parent, (DLGPROC)_PrefConfigProc, (LPARAM)this);
 	}
 
 	virtual t_uint32 get_state()
@@ -100,7 +100,7 @@ public:
 				pages[0].dwFlags = PSP_DEFAULT | PSP_USETITLE;
 				pages[0].hInstance = core_api::get_my_instance();
 				pages[0].pszTemplate = MAKEINTRESOURCE(IDD_COMMON_PREF);
-				pages[0].pfnDlgProc = &preferences_page_instance_alsong_lyric::CommonConfigProc;
+				pages[0].pfnDlgProc = (DLGPROC)&preferences_page_instance_alsong_lyric::CommonConfigProc;
 				pages[0].pszTitle = TEXT("공통 설정");
 				pages[0].lParam = NULL;
 
@@ -108,7 +108,7 @@ public:
 				pages[1].dwFlags = PSP_DEFAULT | PSP_USETITLE;
 				pages[1].hInstance = core_api::get_my_instance();
 				pages[1].pszTemplate = MAKEINTRESOURCE(IDD_UI_PREF_COMMON);
-				pages[1].pfnDlgProc = &UIPreference::ConfigProcDispatcher;
+				pages[1].pfnDlgProc = (DLGPROC)&UIPreference::ConfigProcDispatcher;
 				pages[1].pszTitle = TEXT("외부 창 설정");
 				pages[1].lParam = (LPARAM)(&cfg_outer.get_value());
 
@@ -318,7 +318,7 @@ public:
 
 	static void OpenLyricSourceConfig(HWND parent, LyricSource *source, int type)
 	{
-		DialogBoxParam(core_api::get_my_instance(), MAKEINTRESOURCE(IDD_LYRICSOURCECFG), parent, LyricSourceConfigProc, (LPARAM)&std::make_pair(source, type));
+		DialogBoxParam(core_api::get_my_instance(), MAKEINTRESOURCE(IDD_LYRICSOURCECFG), parent, (DLGPROC)LyricSourceConfigProc, (LPARAM)&std::make_pair(source, type));
 		LyricManagerInstance->UpdateConfig();
 	}
 
@@ -355,7 +355,7 @@ public:
 					{
 					case IDC_LYRICSOURCE_ADD:
 						{
-							LyricSource *res = (LyricSource *)DialogBox(core_api::get_my_instance(), MAKEINTRESOURCE(IDD_LYRICSOURCE_ADD), hWnd, &preferences_page_instance_alsong_lyric::LyricSourceAddProc);
+							LyricSource *res = (LyricSource *)DialogBox(core_api::get_my_instance(), MAKEINTRESOURCE(IDD_LYRICSOURCE_ADD), hWnd, (DLGPROC)&preferences_page_instance_alsong_lyric::LyricSourceAddProc);
 							if(res)
 							{
 								if(cfg_enabledlyricsource.exists(res->GetGUID()))
@@ -441,7 +441,7 @@ public:
 						}
 					case IDC_LYRICSAVE_ADD:
 						{
-							LyricSource *res = (LyricSource *)DialogBox(core_api::get_my_instance(), MAKEINTRESOURCE(IDD_LYRICSOURCE_ADD), hWnd, &preferences_page_instance_alsong_lyric::LyricSourceAddProc);
+							LyricSource *res = (LyricSource *)DialogBox(core_api::get_my_instance(), MAKEINTRESOURCE(IDD_LYRICSOURCE_ADD), hWnd, (DLGPROC)&preferences_page_instance_alsong_lyric::LyricSourceAddProc);
 							if(res)
 							{
 								if(cfg_enabledlyricsource.exists(res->GetGUID()))
@@ -534,11 +534,11 @@ public:
 			if(((LPNMHDR)lParam)->code == PSN_APPLY)
 			{
 				cfg_skipempty = (IsDlgButtonChecked(hWnd, IDC_SKIPEMPTY) ? true : false);
-				SetWindowLong(hWnd, DWL_MSGRESULT, PSNRET_NOERROR);
+				SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			}
 			else if(((LPNMHDR)lParam)->code == PSN_KILLACTIVE)
 			{
-				SetWindowLong(hWnd, DWL_MSGRESULT, FALSE);
+				SetWindowLongPtr(hWnd, DWLP_MSGRESULT, FALSE);
 			}
 			return TRUE;
 		}
@@ -793,13 +793,13 @@ BOOL UIPreference::UIConfigProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM 
 			SetRect(&rt, 0, 200, clientRect.right, clientRect.bottom);
 			InvalidateRect(hWnd, &rt, TRUE);
 
-			SetWindowLong(hWnd, DWL_MSGRESULT, PSNRET_NOERROR);
+			SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			if(((LPPSHNOTIFY)lParam)->lParam)
 				shouldClose = 1;
 		}
 		else if(((LPNMHDR)lParam)->code == PSN_KILLACTIVE)
 		{
-			SetWindowLong(hWnd, DWL_MSGRESULT, FALSE);
+			SetWindowLongPtr(hWnd, DWLP_MSGRESULT, FALSE);
 			//DestroyWindow(GetParent(hWnd));
 		}
 		else if(((LPNMHDR)lParam)->code == PSN_RESET)
@@ -865,7 +865,7 @@ void UIPreference::OpenConfigPopup(HWND hParent)
 	page.dwFlags = PSP_DEFAULT;
 	page.hInstance = core_api::get_my_instance();
 	page.pszTemplate = MAKEINTRESOURCE(IDD_UI_PREF_COMMON);
-	page.pfnDlgProc = &UIPreference::ConfigProcDispatcher;
+	page.pfnDlgProc = (DLGPROC)&UIPreference::ConfigProcDispatcher;
 	page.lParam = (LPARAM)this;
 	pages[0] = CreatePropertySheetPage(&page);
 
