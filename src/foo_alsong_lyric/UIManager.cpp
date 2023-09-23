@@ -26,79 +26,15 @@
 
 UIManager::UIManager(UIPreference *Setting, pfc::string8 *Script) : m_Setting(Setting), m_Script(Script)
 {
-	SquirrelVM::Init();
-	SquirrelVM::GetVMSys(m_vmSys);
-
-	sq_setprintfunc(m_vmSys, &UIManager::ScriptDebugLog, &UIManager::ScriptDebugLog);
-
-	UICanvas::RegisterCanvas();
-
-	SquirrelObject InitScript = SquirrelVM::CompileBuffer(TEXT("function Init() { }"));
-	SquirrelVM::RunScript(InitScript);
-
-	SqPlus::RegisterGlobal(&UIManager::IsHighlightedLine, TEXT("IsHighlightedLine"));
-
-	SquirrelObject DrawScript = SquirrelVM::CompileBuffer(
-		TEXT("function Draw(canvas, lines) { \n")
-		TEXT("local normalfont = WndSetting.GetNormalFont();\n")
-		TEXT("local highlightfont = WndSetting.GetHighlightFont();\n")
-		TEXT("local h = 0; foreach(i,v in lines) {\n")
-		TEXT("local sz;\n")
-		TEXT("if(IsHighlightedLine(v))\n")
-		TEXT("sz = canvas.EstimateText(highlightfont, v);\n")
-		TEXT("else\n")
-		TEXT("sz = canvas.EstimateText(normalfont, v);\n")
-		TEXT("h += sz.height * WndSetting.GetLineMargin() / 100.0 + WndSetting.GetOutlineSize() / 2}\n")
-		TEXT("local sz = canvas.GetCanvasSize();\n")
-		TEXT("if(WndSetting.GetBgType() == 0)\n")
-		TEXT("canvas.Fill(0, 0, sz.width, sz.height, WndSetting.GetBackColor());\n")
-		TEXT("else if(WndSetting.GetBgType() == 1) canvas.DrawImage(0, 0, sz.width, sz.height, WndSetting.GetBackImage());\n")
-		TEXT("else if(WndSetting.GetBgType() == 2) canvas.SetTransparent();\n")
-		TEXT("local starty = 0;\n")
-		TEXT("if(WndSetting.GetVAlign() == 2)\n")
-		TEXT("starty = (sz.height - h) / 2;\n")
-		TEXT("else if(WndSetting.GetVAlign() == 3) starty = sz.height - h;\n")
-		TEXT("if(starty < 0) starty = 0;")
-		TEXT("canvas.SetDrawTextOrigin(UIPoint(0, starty));\n")
-		TEXT("foreach(i, v in lines) {\n")
-		TEXT("if(IsHighlightedLine(v))\n")
-		TEXT("canvas.DrawText(highlightfont, v, WndSetting.GetHAlign(), WndSetting.GetLineMargin() / 100.0, WndSetting.GetFontTransparency(), WndSetting.GetOutlineColor(), WndSetting.GetOutlineSize());\n")
-		TEXT("else\n")
-		TEXT("canvas.DrawText(normalfont, v, WndSetting.GetHAlign(), WndSetting.GetLineMargin() / 100.0, WndSetting.GetFontTransparency(), WndSetting.GetOutlineColor(), WndSetting.GetOutlineSize());}}\n")
-		);
-	SquirrelVM::RunScript(DrawScript);
-
-	SqPlus::SQClassDefNoConstructor<UIPreference>(TEXT("UIPreference")).
-		func(&UIPreference::GetBkColor, TEXT("GetBackColor")).
-		func(&UIPreference::GetBgImagePath, TEXT("GetBackImage")).
-		func(&UIPreference::GetBgType, TEXT("GetBgType")).
-		func(&UIPreference::GetHorizentalAlign, TEXT("GetHAlign")).
-		func(&UIPreference::GetVerticalAlign, TEXT("GetVAlign")).
-		func(&UIPreference::GetLineMargin, TEXT("GetLineMargin")).
-		func(&UIPreference::GetHighlightFont, TEXT("GetHighlightFont")).
-		func(&UIPreference::GetNormalFont, TEXT("GetNormalFont")).
-		func(&UIPreference::GetFontTransparency, TEXT("GetFontTransparency")).
-		func(&UIPreference::GetOutlineColor, TEXT("GetOutlineColor")).
-		func(&UIPreference::GetOutlineSize, TEXT("GetOutlineSize"));
-
-	SqPlus::BindVariable(m_Setting, TEXT("WndSetting"));
-
-	m_RootTable = SquirrelVM::GetRootTable();
-	SqPlus::SquirrelFunction<void>(m_RootTable, TEXT("Init"))();
-
 	InitializeCriticalSection(&m_DrawCrit);
 }
 
 UIManager::~UIManager()
 {
-	SquirrelVM::SetVMSys(m_vmSys);
-	SquirrelVM::Shutdown();
-	m_vmSys.Reset();
-
 	DeleteCriticalSection(&m_DrawCrit);
 }
 
-int UIManager::IsHighlightedLine(const SQChar *wstr)
+int UIManager::IsHighlightedLine(const wchar_t *wstr)
 {
 	if(wstr[0] == 1)
 		return true;
@@ -176,44 +112,59 @@ void UIManager::Draw(HWND hWnd, HDC hdc)
 	if(!lyric.size())
 		return;
 
-	SquirrelVM::SetVMSys(m_vmSys);
-	SquirrelObject lyrics = SquirrelVM::CreateArray(0);
+	vector<std::wstring> lyrics;
 
 	for(i = 0; i < before - lyricbefore.size(); i ++)
-		lyrics.ArrayAppend((std::wstring(1, (wchar_t)2) + TEXT(" ")).c_str());
+		lyrics.push_back((std::wstring(1, (wchar_t)2) + TEXT(" ")).c_str());
 	if(lyric.size() < m_Setting->GetnLine())
 	{
 		for(i = 0; i < lyricbefore.size(); i ++)
 		{
 			std::wstring nowlrcw = std::wstring(1, (wchar_t)2) + pfc::stringcvt::string_wide_from_utf8_fast(lyricbefore[i].lyric.c_str()).get_ptr();
-			lyrics.ArrayAppend(nowlrcw.c_str());
+			lyrics.push_back(nowlrcw);
 		}
 	}
 	for(i = 0; i < lyric.size(); i ++)
 	{
 		std::wstring nowlrcw = std::wstring(1, (wchar_t)1) + pfc::stringcvt::string_wide_from_utf8_fast(lyric[i].lyric.c_str()).get_ptr();
-		lyrics.ArrayAppend(nowlrcw.c_str());
+		lyrics.push_back(nowlrcw);
 	}
 	for(i = max(lyric.size() - 1, 0); i < lyricafter.size(); i ++)
 	{
 		std::wstring nowlrcw = std::wstring(1, (wchar_t)2) + pfc::stringcvt::string_wide_from_utf8_fast(lyricafter[i].lyric.c_str()).get_ptr();
-		lyrics.ArrayAppend(nowlrcw.c_str());
+		lyrics.push_back(nowlrcw);
 	}
 
 	UICanvas canvas(hWnd, hdc);
-	SqPlus::SquirrelFunction<void>(m_RootTable, TEXT("Draw"))(&canvas, lyrics);
-
+	auto normalfont = m_Setting->GetNormalFont();
+	auto highlightfont = m_Setting->GetHighlightFont();
+	int h = 0;
+	for(auto v : lyrics) {
+		UISize sz;
+		if (IsHighlightedLine(v.c_str()))
+			sz = canvas.EstimateText(highlightfont, v.c_str());
+		else
+			sz = canvas.EstimateText(normalfont, v.c_str());
+		h += sz.height * m_Setting->GetLineMargin() / 100.0 + m_Setting->GetOutlineSize() / 2;
+	}
+	UISize sz = canvas.GetCanvasSize();
+	if (m_Setting->GetBgType() == 0)
+		canvas.Fill(0, 0, sz.width, sz.height, m_Setting->GetBkColor());
+	else if (m_Setting->GetBgType() == 1) canvas.DrawImage(0, 0, sz.width, sz.height, m_Setting->GetBgImagePath());
+	else if (m_Setting->GetBgType() == 2) canvas.SetTransparent();
+	int starty = 0;
+	if (m_Setting->GetVerticalAlign() == 2)
+		starty = (sz.height - h) / 2;
+	else if (m_Setting->GetVerticalAlign() == 3) starty = sz.height - h;
+	if (starty < 0) starty = 0;
+		canvas.SetDrawTextOrigin(UIPoint(0, starty));
+	for (auto v : lyrics) {
+		if (IsHighlightedLine(v.c_str()))
+			canvas.DrawText(highlightfont, v.c_str(), m_Setting->GetHorizentalAlign(), m_Setting->GetLineMargin() / 100.0, m_Setting->GetFontTransparency(), m_Setting->GetOutlineColor(), m_Setting->GetOutlineSize());
+		else
+			canvas.DrawText(normalfont, v.c_str(), m_Setting->GetHorizentalAlign(), m_Setting->GetLineMargin() / 100.0, m_Setting->GetFontTransparency(), m_Setting->GetOutlineColor(), m_Setting->GetOutlineSize());
+	}
 	LeaveCriticalSection(&m_DrawCrit);
-}
-
-void UIManager::ScriptDebugLog(HSQUIRRELVM v,const SQChar* s,...)
-{
-	static SQChar temp[2048];
-	va_list vl;
-	va_start(vl, s);
-	scvsprintf(temp, s, vl);
-	console::formatter() << "foo_alsong_lyric: Squirrel print:" << pfc::stringcvt::string_utf8_from_wide(temp);
-	va_end(vl);
 }
 
 bool UIManager::on_keydown(WPARAM wParam) 

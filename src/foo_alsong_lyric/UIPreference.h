@@ -250,5 +250,3 @@ private:
 
 	BYTE bReserved[446]; //구조체 크기가 변하면 설정이 초기화된다. 나중에 변수 추가할때 여기서 뺄것
 };
-
-DECLARE_INSTANCE_TYPE(UIPreference)

@@ -93,34 +93,8 @@ UICanvas::~UICanvas()
 	DeleteDC(m_hDC);
 }
 
-void UICanvas::RegisterCanvas()
-{
-	SqPlus::SQClassDefNoConstructor<UICanvas>(TEXT("UICanvas")).
-		func(&UICanvas::DrawText, TEXT("DrawText")).
-		func(&UICanvas::EstimateText, TEXT("EstimateText")).
-		func(&UICanvas::SetDrawTextOrigin, TEXT("SetDrawTextOrigin")).
-		func(&UICanvas::GetCanvasSize, TEXT("GetCanvasSize")).
-		func(&UICanvas::Fill, TEXT("Fill")).
-		func(&UICanvas::DrawImage, TEXT("DrawImage")).
-		func(&UICanvas::SetTransparent, TEXT("SetTransparent"));
 
-	SqPlus::SQClassDefNoConstructor<UIFont>(TEXT("UIFont")).
-		overloadConstructor<UIFont(*)()>();
-
-	SqPlus::SQClassDefNoConstructor<UISize>(TEXT("UISize")).
-		overloadConstructor<UISize(*)()>().
-		overloadConstructor<UISize(*)(int, int)>().
-		var(&UISize::width, TEXT("width")).
-		var(&UISize::height, TEXT("height"));
-
-	SqPlus::SQClassDefNoConstructor<UIPoint>(TEXT("UIPoint")).
-		overloadConstructor<UIPoint(*)()>().
-		overloadConstructor<UIPoint(*)(int, int)>().
-		var(&UIPoint::x, TEXT("x")).
-		var(&UIPoint::y, TEXT("y"));
-}
-
-void UICanvas::DrawImage(int x, int y, int width, int height, const SQChar *path)
+void UICanvas::DrawImage(int x, int y, int width, int height, const wchar_t *path)
 {
 	Gdiplus::Bitmap bitmap(path);
 	Gdiplus::Graphics g(m_hDC);
@@ -155,7 +129,7 @@ void UICanvas::SetTransparent()
 	}
 }
 
-void UICanvas::DrawText(const UIFont &font, const SQChar *text, int align, float heightratio, int fontTransparency, COLORREF outlineColor, uint32_t outlineSize)
+void UICanvas::DrawText(const UIFont &font, const wchar_t *text, int align, float heightratio, int fontTransparency, COLORREF outlineColor, uint32_t outlineSize)
 {
 	if(!m_hDC)
 		return;
@@ -214,7 +188,7 @@ UISize UICanvas::GetCanvasSize()
 	return UISize(m_DrawRect.right, m_DrawRect.bottom);
 }
 
-UISize UICanvas::EstimateText(const UIFont &font, const SQChar *text)
+UISize UICanvas::EstimateText(const UIFont &font, const wchar_t *text)
 {
 	if(!m_hDC)
 		return UISize(0, 0);

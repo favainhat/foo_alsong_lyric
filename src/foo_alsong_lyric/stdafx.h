@@ -51,7 +51,6 @@
 #include "../../sdk/foobar2000/SDK/foobar2000.h"
 #include "../../sdk/foobar2000/helpers/helpers.h"
 #include "../../sdk/columns_ui-sdk/ui_extension.h"
-#include "../../3rdparty/Squirrel/sqplus/sqplus.h"
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "shlwapi.lib")

@@ -26,8 +26,6 @@ struct UISize
 	UISize(int w, int h) : width(w), height(h) {}
 };
 
-DECLARE_INSTANCE_TYPE(UISize)
-
 struct UIPoint
 {
 	int x;
@@ -36,8 +34,6 @@ struct UIPoint
 	UIPoint() : x(0), y(0) {};
 	UIPoint(int _x, int _y) : x(_x), y(_y) {}
 };
-
-DECLARE_INSTANCE_TYPE(UIPoint)
 
 struct UIFontDescription
 {
@@ -62,8 +58,6 @@ public:
 	UIFont(const UIFontDescription & fontdesc);
 };
 
-DECLARE_INSTANCE_TYPE(UIFont)
-
 class UICanvas
 {
 private:
@@ -79,15 +73,12 @@ public:
 	UICanvas::UICanvas(HWND hWnd, HDC hdc, const RECT &drawRect);
 	~UICanvas();
 
-	void DrawText(const UIFont &font, const SQChar *text, int align, float heightratio, int fontTransparency, COLORREF outlineColor, uint32_t outlineSize);
-	UISize EstimateText(const UIFont &font, const SQChar *text);
+	void DrawText(const UIFont &font, const wchar_t *text, int align, float heightratio, int fontTransparency, COLORREF outlineColor, uint32_t outlineSize);
+	UISize EstimateText(const UIFont &font, const wchar_t *text);
 	UISize GetCanvasSize();
 	void SetDrawTextOrigin(const UIPoint &pt);
 	void Fill(int x, int y, int width, int height, COLORREF color);
-	void DrawImage(int x, int y, int width, int height, const SQChar *path);
+	void DrawImage(int x, int y, int width, int height, const wchar_t *path);
 	void SetTransparent();
 
-	static void RegisterCanvas();
 };
-
-DECLARE_INSTANCE_TYPE(UICanvas)

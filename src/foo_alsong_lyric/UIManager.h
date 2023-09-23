@@ -34,11 +34,8 @@ private:
 	bool on_keydown(WPARAM wParam);
 	void on_contextmenu(HWND hWndparent);
 	void Draw(HWND hWnd, HDC hdc);
-	static void ScriptDebugLog(HSQUIRRELVM v,const SQChar* s,...);
-	static int IsHighlightedLine(const SQChar *wstr);
+	static int IsHighlightedLine(const wchar_t*wstr);
 
-	SquirrelVMSys m_vmSys;
-	SquirrelObject m_RootTable;
 	UIPreference *m_Setting;
 	pfc::string8 *m_Script;
 	CRITICAL_SECTION m_DrawCrit;
