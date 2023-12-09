@@ -273,7 +273,11 @@ LRESULT CALLBACK UIWnd::WindowProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPAR
 
 		break;
 	case WM_SHOWWINDOW:
+		_this->m_UI->Invalidated(hWnd);
+		break;
 	case WM_SIZE:
+		if(!IsIconic(hWnd))
+			cfg_outer_window_placement.on_window_destruction(hWnd);
 		_this->m_UI->Invalidated(hWnd);
 		break;
 	case WM_NCHITTEST:
