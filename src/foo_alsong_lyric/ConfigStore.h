@@ -114,11 +114,11 @@ public:
 
 	void get_data_raw(stream_writer * p_stream,abort_callback & p_abort)
 	{
-		p_stream->write_lendian_t(m_cfgmap.size(), p_abort);
+		p_stream->write_lendian_t((int)m_cfgmap.size(), p_abort);
 		for(std::map<GUID, std::map<std::string, std::string> >::iterator it = m_cfgmap.begin(); it != m_cfgmap.end(); it ++)
 		{
 			p_stream->write(&it->first, sizeof(GUID), p_abort);
-			p_stream->write_lendian_t(it->second.size(), p_abort);
+			p_stream->write_lendian_t((int)it->second.size(), p_abort);
 			for(std::map<std::string, std::string>::iterator iit = it->second.begin(); iit != it->second.end(); iit ++)
 			{
 				p_stream->write_string(iit->first.c_str(), p_abort);
