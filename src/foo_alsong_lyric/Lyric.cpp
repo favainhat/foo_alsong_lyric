@@ -80,7 +80,10 @@ DWORD Lyric::Split(const char *Delimiter)
 		m_LyricLines.push_back(LyricLine(time, temp));
 
 	}
-
+	//temporay workaround! if m_LyricLines is not empty add blank line.
+	if (m_LyricLines.size() > 0) {
+		m_LyricLines.insert(m_LyricLines.begin(), LyricLine(0, ""));
+	}
 	m_LyricIterator = m_LyricLines.begin();
 
 	return S_OK;

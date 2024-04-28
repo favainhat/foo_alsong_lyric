@@ -274,8 +274,13 @@ void LyricManager::CountLyric()
 	{
 		if(m_CurrentLyric->IsEndOfLyric(m_LyricLine))
 		{
-			if(!m_CurrentLyric->IsBeginOfLyric(m_LyricLine))
-				m_LyricLine --;
+			if (!m_CurrentLyric->IsBeginOfLyric(m_LyricLine)) {
+				m_LyricLine--;
+			}
+			while (!m_CurrentLyric->IsBeginOfLyric(m_LyricLine) && m_LyricLine->time == (m_LyricLine - 1)->time) {
+				m_LyricLine--;
+			}
+
 			RedrawHandler(); //Point to last lyric
 			return;
 		}
