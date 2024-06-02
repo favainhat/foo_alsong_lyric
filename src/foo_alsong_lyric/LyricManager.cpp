@@ -174,6 +174,8 @@ void LyricManager::on_playback_stop(play_control::t_stop_reason reason)
 		m_CurrentLyric->Clear();
 		m_LyricLine = m_CurrentLyric->GetIteratorAt(0);
 	}
+	m_Status = std::string(pfc::stringcvt::string_utf8_from_wide(TEXT("")));
+	LyricManager::RedrawHandler();
 	m_track.release();
 }
 
